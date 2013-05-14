@@ -137,20 +137,24 @@ class SOAPClient(object):
         service.
         """
         # We must specify service and port for Nuxeo
-        client = suds.client.Client(
-            '/'.join((self.settings.repository_url, service)) + '?wsdl',
-            proxy=self.proxies,
-            service=service,
-            port=service + 'Port',
-            cachingpolicy=1)
-        if self.settings.repository_user:
-            # Timestamp must be included, and be first for Alfresco.
-            auth = suds.wsse.Security()
-            auth.tokens.append(suds.wsse.Timestamp(validity=300))
-            auth.tokens.append(suds.wsse.UsernameToken(
-                    self.settings.repository_user,
-                    self.settings.repository_password))
-            client.set_options(wsse=auth)
+        # hardcoded for sharepoint
+        from suds.transport.https import WindowsHttpAuthenticated
+        ntlm = WindowsHttpAuthenticated(username=self.settings.repository_user, password=self.settings.repository_password)
+        client = suds.client.Client('http://spsdev1dr/sites/WSearchTest/_vti_bin/CMISSoapwsdl.aspx', service=service, port=service+'Port', transport=ntlm)
+#        client = suds.client.Client(
+#            '/'.join((self.settings.repository_url, service)) + '?wsdl',
+#            proxy=self.proxies,
+#            service=service,
+#            port=service + 'Port',
+#            cachingpolicy=1)
+#        if self.settings.repository_user:
+#            # Timestamp must be included, and be first for Alfresco.
+#            auth = suds.wsse.Security()
+#            auth.tokens.append(suds.wsse.Timestamp(validity=300))
+#            auth.tokens.append(suds.wsse.UsernameToken(
+#                    self.settings.repository_user,
+#                    self.settings.repository_password))
+#            client.set_options(wsse=auth)
         return client.service
 
     @Lazy
@@ -204,15 +208,23 @@ class SOAPConnector(object):
     @soap_error()
     @soap_cache
     def get_object_children(self, cmis_id):
+#        convert = lambda c: properties_to_dict(
+#            c.objectInFolder.object,
+#            identifier=getattr(c.objectInFolder, 'pathSegment', None))
         convert = lambda c: properties_to_dict(
-            c.objectInFolder.object,
-            identifier=getattr(c.objectInFolder, 'pathSegment', None))
-        return map(convert, self._client.navigation.getDescendants(
+            c.object,
+            identifier=getattr(c, 'pathSegment', None))
+        return map(convert, self._client.navigation.getChildren(
                 repositoryId=self._repository_id,
                 folderId=cmis_id,
-                depth=1,
                 filter='*',
-                includePathSegment=True))
+                includePathSegment=True)[0])
+#        return map(convert, self._client.navigation.getDescendants(
+#                repositoryId=self._repository_id,
+#                folderId=cmis_id,
+#                depth=1,
+#                filter='*',
+#                includePathSegment=True))
 
     @soap_error()
     @soap_cache
@@ -274,6 +286,7 @@ class SOAPConnector(object):
 
     @soap_error()
     def start(self):
+
         if self._repository_id is not None:
             return self._root
 
