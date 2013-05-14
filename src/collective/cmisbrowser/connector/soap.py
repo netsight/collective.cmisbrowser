@@ -137,24 +137,28 @@ class SOAPClient(object):
         service.
         """
         # We must specify service and port for Nuxeo
-        # hardcoded for sharepoint
-        from suds.transport.https import WindowsHttpAuthenticated
-        ntlm = WindowsHttpAuthenticated(username=self.settings.repository_user, password=self.settings.repository_password)
-        client = suds.client.Client('http://spsdev1dr/sites/WSearchTest/_vti_bin/CMISSoapwsdl.aspx', service=service, port=service+'Port', transport=ntlm)
-#        client = suds.client.Client(
-#            '/'.join((self.settings.repository_url, service)) + '?wsdl',
-#            proxy=self.proxies,
-#            service=service,
-#            port=service + 'Port',
-#            cachingpolicy=1)
-#        if self.settings.repository_user:
-#            # Timestamp must be included, and be first for Alfresco.
-#            auth = suds.wsse.Security()
-#            auth.tokens.append(suds.wsse.Timestamp(validity=300))
-#            auth.tokens.append(suds.wsse.UsernameToken(
-#                    self.settings.repository_user,
-#                    self.settings.repository_password))
-#            client.set_options(wsse=auth)
+        if self.settings.repository_ntlm:
+            from suds.transport.https import WindowsHttpAuthenticated
+            ntlm = WindowsHttpAuthenticated(username=self.settings.repository_user, password=self.settings.repository_password)
+            client = suds.client.Client(self.settings.repository_url, 
+                                        service=service, 
+                                        port=service+'Port', 
+                                        transport=ntlm)
+        else:
+            client = suds.client.Client(
+                '/'.join((self.settings.repository_url, service)) + '?wsdl',
+                proxy=self.proxies,
+                service=service,
+                port=service + 'Port',
+                cachingpolicy=1)
+            if self.settings.repository_user:
+                # Timestamp must be included, and be first for Alfresco.
+                auth = suds.wsse.Security()
+                auth.tokens.append(suds.wsse.Timestamp(validity=300))
+                auth.tokens.append(suds.wsse.UsernameToken(
+                        self.settings.repository_user,
+                        self.settings.repository_password))
+                client.set_options(wsse=auth)
         return client.service
 
     @Lazy

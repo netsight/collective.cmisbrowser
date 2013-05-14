@@ -85,6 +85,7 @@ class CMISSettingsAdapter(object):
     repository_path = ConfigString('repository_path').property()
     repository_user = ConfigString('repository_user').property()
     repository_password = ConfigString('repository_password').property()
+    repository_ntlm = ConfigString('repository_ntlm').property()
     repository_connector = ConfigString('repository_connector').property()
     repository_cache = ConfigInteger('repository_cache').property()
     folder_view = ConfigString('folder_view').property()

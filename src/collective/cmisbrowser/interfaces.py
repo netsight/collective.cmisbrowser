@@ -69,6 +69,11 @@ class ICMISSettings(Interface):
     repository_password = schema.Password(
         title=_(u'Password to access CMIS repository'),
         required=False)
+    repository_ntlm = schema.Bool(
+        title=_(u"Use NTLM auth (only works with SOAP API)"),
+        description=_(u'Select this to enable NTLM authentication with the SOAP API (useful for Sharepoint)'),
+        default=False,
+        required=False)
     repository_connector = schema.Choice(
         title=_('CMIS connection type to the repository'),
         description=_(u'Select if you want to connect to the CMIS repository using SOAP or REST.'),

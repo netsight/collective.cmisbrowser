@@ -78,6 +78,7 @@ class CMISBrowser(Container):
     repository_path = FieldProperty(ICMISBrowser['repository_path'])
     repository_user = FieldProperty(ICMISBrowser['repository_user'])
     repository_password = FieldProperty(ICMISBrowser['repository_password'])
+    repository_ntlm = FieldProperty(ICMISBrowser['repository_ntlm'])
     repository_connector = FieldProperty(ICMISBrowser['repository_connector'])
     repository_cache = FieldProperty(ICMISBrowser['repository_cache'])
     folder_view = FieldProperty(ICMISBrowser['folder_view'])
