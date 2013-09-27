@@ -54,7 +54,7 @@ def rest_cache(wrapped):
                 self._settings.UID(),
                 self._repository_id,
                 id_or_path.encode('ascii', 'xmlcharrefreplace'),
-                str(time.time() // (self._settings.repository_cache * 60))))
+                str(time.time() // max(1, (self._settings.repository_cache * 60)))))
 
     return ram.cache(get_cache_key)(wrapped)
 
