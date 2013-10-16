@@ -130,7 +130,6 @@ class CMISZopeAPI(object):
                 self.root.CMISId())
         else:
             query = u"SELECT R.*  FROM cmis:document R " + \
-                u"WHERE CONTAINS('%s') AND IN_TREE(R, '%s')" % (
-                text,
-                self.root.CMISId())
+                u"WHERE CONTAINS('%s')" % (
+                text,)
         return self.query(query)
